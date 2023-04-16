@@ -1,0 +1,14 @@
+{
+  "name": "alt-maker",
+  "version": "0.1.0",
+  "description": "Alt-Maker best map-editor!",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "EtherCD",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
