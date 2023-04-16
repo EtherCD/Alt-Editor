@@ -12,8 +12,18 @@ export default class World {
         this.fromJSON()
     }
 
-    update() {
+    update(timeFix, delta) {
+        for (let a in this.areas) {
+            this.areas[a].update(timeFix, delta)
+        }
+    }
 
+    reverse() {
+        let outMap = {"name":this.name, "datas": this.mjson.datas}
+        for (let a in this.areas) {
+            outMap[a] = this.areas[a].reverse()
+        }
+        return outMap
     }
 
     draw(ctx, off, fov) {
@@ -28,7 +38,11 @@ export default class World {
         ctx.fillText(this.name, 1280 / 2, 40)
         ctx.closePath()
         for (let a in this.areas) {
-            this.areas[a].draw(ctx, off, fov)
+            if (this.areas[a].pos.x-off.x-this.areas[a].size.x * fov < this.areas[a].size.x * fov &&
+                (this.areas[a].pos.x-off.x)+this.areas[a].size.x * fov > -this.areas[a].size.x * fov &&
+                this.areas[a].pos.y-off.y-this.areas[a].size.y * fov < this.areas[a].size.y * fov &&
+                (this.areas[a].pos.y-off.y)+this.areas[a].size.y * fov > -this.areas[a].size.y * fov)
+                this.areas[a].draw(ctx, off, fov)
         }
     }
 

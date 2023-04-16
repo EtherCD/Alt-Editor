@@ -97,6 +97,19 @@ const ctx = canvas.getContext("2d")
 
 let off = new Vector(-1280 / 2, -720 / 2)
 let fov = 1
+let selectedArea
+let hover = false
+let filename = ""
+let movement = {
+    u: false,
+    d: false,
+    l: false,
+    r: false,
+    s: false,
+    mouse: false,
+    mouX: 0,
+    mouY: 0,
+}
 
 //Listeners
 function loadMap(selectedFile) {
@@ -116,6 +129,7 @@ function loadMap(selectedFile) {
             map = newArr
         }
         localStorage.oldFile = selectedFile
+        filename = selectedFile.name
         world = new World(map)
     }
     fr.readAsText(selectedFile)
@@ -131,43 +145,18 @@ document.getElementById("play").addEventListener("click", e => {
     }
     loop()
 })
-let movement = {
-    u: false,
-    d: false,
-    l: false,
-    r: false,
-    s: false,
-    mouse: false,
-    mouX: 0,
-    mouY: 0,
-}
-canvas.addEventListener("blur", () => movement = {
-    u: false,
-    d: false,
-    l: false,
-    r: false,
-    s: false,
-    mouse: false,
-    mouX: 0,
-    mouY: 0,
-})
 
 document.addEventListener('keydown', (e) => {
-    if (play) {
+    if (play && !selectedArea && !hover) {
         if (e.keyCode == 87 || e.keyCode == 38) movement.u = true
         if (e.keyCode == 83 || e.keyCode == 40) movement.d = true
         if (e.keyCode == 65 || e.keyCode == 37) movement.l = true
         if (e.keyCode == 68 || e.keyCode == 39) movement.r = true
         if (e.shiftKey) movement.s = true
-        if (e.keyCode == 76 || e.keyCode == 27) {
-            if ($('.settings-div')[0].classList.contains('show-settings'))
-                $('.settings-div')[0].classList.remove('show-settings')
-            else $('.settings-div')[0].classList.add('show-settings')
-        }
     }
 })
 document.addEventListener("keyup", (e) => {
-    if (play) {
+    if (play && !selectedArea && !hover) {
         if (e.keyCode == 87 || e.keyCode == 38) movement.u = false
         if (e.keyCode == 83 || e.keyCode == 40) movement.d = false
         if (e.keyCode == 65 || e.keyCode == 37) movement.l = false
@@ -175,22 +164,39 @@ document.addEventListener("keyup", (e) => {
         if (!e.shiftKey) movement.s = false
     }
 })
-canvas.addEventListener("mousemove", (e) => {
-    if (play) {
-        movement.mouX =
-            Math.round(
-                (e.clientX - document.documentElement.clientWidth / 2) * 100
-            ) / 100
-        movement.mouY =
-            Math.round(
-                (e.clientY - document.documentElement.clientHeight / 2) * 100
-            ) / 100
+document.addEventListener("mousemove", (e) => {
+    if (play && !hover) {
+        let { offsetX: x, offsetY: y } = e
+        let isSomeHover = false
+        for (let a in world.areas) {
+            let area = world.areas[a]
+            if (x > (area.pos.x - off.x) / fov
+                && x < ((area.pos.x - off.x) + area.size.x) / fov
+                && y > (area.pos.y - off.y) / fov
+                && y < ((area.pos.y - off.y) + area.size.y) / fov) {
+                area.hovered = true
+            } else {
+                area.hovered = false
+            }
+        }
+
     }
 })
-canvas.addEventListener("mousedown", (e) => {
-    if (play) {
+document.addEventListener("mousedown", (e) => {
+    if (play && !hover) {
         if (e.buttons == 1) {
             movement.mouse = !movement.mouse
+            selectedArea = null
+            for (let a in world.areas) {
+                let area = world.areas[a]
+                if (area.hovered) {
+                    area.selected = true
+                    selectedArea = area.id
+                    document.querySelector('#panel-area-props').innerHTML = area.toHTML()
+                } else {
+                    area.selected = false
+                }
+            }
         }
     }
 })
@@ -212,6 +218,31 @@ document.getElementById("input").addEventListener('change', () => {
         loadMap(selectedFile)
     }
 })
+document.getElementById("panel").onmouseover = () => { hover = true }
+document.getElementById("panel").onmouseleave = () => { hover = false }
+document.getElementById("download").onclick = () => {
+    download(filename)
+}
+/*document.getElementById("friction").addEventListener("change", e=>{
+    if (selectedArea != null) {
+        world.areas[selectedArea].changeProp("friction", document.getElementById("friction").value)
+    }
+})
+document.getElementById("only-name").addEventListener("change", e=>{
+    if (selectedArea != null) {
+        world.areas[selectedArea].changeProp("only-name", document.getElementById("only-name").value)
+    }
+})
+document.getElementById("area-name").addEventListener("change", e=>{
+    if (selectedArea != null) {
+        world.areas[selectedArea].changeProp("area-name", document.getElementById("area-name").value)
+    }
+})
+document.getElementById("lighting").addEventListener("change", e=>{
+    if (selectedArea != null) {
+        world.areas[selectedArea].changeProp("lighting", document.getElementById("lighting").value)
+    }
+})*/
 
 function resize() {
     let scale = window.innerWidth / canvas.width
@@ -221,6 +252,24 @@ function resize() {
     canvas.style.transform = "scale(" + scale + ")"
     canvas.style.left = 1 / 2 * (window.innerWidth - canvas.width) + "px"
     canvas.style.top = 1 / 2 * (window.innerHeight - canvas.height) + "px"
+}
+function download(filename) {
+    var element = document.createElement('a')
+
+    element.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' +
+        encodeURIComponent(JSON.stringify(world.reverse(), null, 2))
+    )
+    element.setAttribute('download', filename)
+
+    element.style.display = 'none'
+    document.body.appendChild(element)
+
+    element.click()
+
+    document.body.removeChild(element)
+    window.location.reload()
 }
 window.onload = () => resize()
 window.onresize = () => resize()
@@ -241,8 +290,28 @@ function loop() {
     ctx.fillRect(0, 0, 1280, 720)
     ctx.closePath()
 
+    if (hover) {
+        movement = {
+            u: false,
+            d: false,
+            l: false,
+            r: false,
+            s: false,
+            mouse: false,
+            mouX: 0,
+            mouY: 0,
+        }
+    }
+
+    document.querySelectorAll("input").forEach(el => {
+        if (selectedArea != undefined) {
+            let area = world.areas[selectedArea]
+            area.changeProps()
+        }
+    })
     player.move(movement)
     player.update(timeFix, delta, off, fov)
 
+    world.update(timeFix, delta)
     world.draw(ctx, off, fov)
 }
