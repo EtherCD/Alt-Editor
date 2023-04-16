@@ -89,7 +89,7 @@ export default class Player {
         if (!movement.r && !movement.l) this.acc.x = 0
         if (!movement.u && !movement.d) this.acc.y = 0
 
-        if (movement.mouse) {
+        /*if (movement.mouse) {
             let distance = this.d(0, 0, movement.mouX, movement.mouY)
 
             let speedX = movement.mouX
@@ -108,7 +108,7 @@ export default class Player {
 
             this.acc.x = distMovement * Math.cos(angle)
             this.acc.y = distMovement * Math.sin(angle)
-        }
+        }*/
     }
 
     d(x1, y1, x2, y2) {

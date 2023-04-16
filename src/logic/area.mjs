@@ -8,7 +8,6 @@ export default class Area {
         this.mjson = wdata
 
         this.size = new Vector(data.properties.size.width * 32, data.properties.size.height * 32)
-        this.color = wdata.datas.fillStyle
         this.pos = pos
         this.zones = {}
         this.name = data.properties["only-name"] || data.properties["area-name"] || id
@@ -32,7 +31,6 @@ export default class Area {
         if (this.lineDashOff > 16) {
             this.lineDashOff = 0
         }
-        
     }
 
     getPanelValue(selector) {
@@ -46,7 +44,7 @@ export default class Area {
     fromJSON() {
         if (this.ajson.zones == undefined) return
         for (let z in this.ajson.zones) {
-            this.zones[z] = new Zone(this.ajson.zones[z], this.size, this.pos)
+            this.zones[z] = new Zone(this.ajson.zones[z], this.size, this.pos, z)
         }
     }
 
@@ -55,7 +53,18 @@ export default class Area {
     }
 
     reverse() {
-        return this.ajson
+        let area = {"properties": {}, "zones": []}
+        this.ajson.properties.size.width ? area.properties.width = this.ajson.properties.size.width : 'none'
+        this.ajson.properties.size.height ? area.properties.height = this.ajson.properties.size.height : 'none'
+        this.ajson.properties["only-name"] != "" ? area.properties["only-name"] = this.ajson.properties["only-name"] : 'none'
+        this.ajson.properties["area-name"] != "" ? area.properties["area-name"] = this.ajson.properties["area-name"] : 'none'
+        this.ajson.properties["friction"] != 0.75 ? area.properties["friction"] = this.ajson.properties["friction"] : 'none'
+        this.ajson.properties["lighting"] != 1 ? area.properties["lighting"] = this.ajson.properties["lighting"] : 'none'
+
+        for (let z in this.zones) {
+            area.zones[z] = this.zones[z].reverse()
+        }
+        return area
     }
 
     changeProps() {
@@ -81,7 +90,7 @@ export default class Area {
         <li id="friction">Friction: <input type="number" placeholder="0.75" max="10" value=${this.ajson.properties.friction || 0.75}></li>
         <li id="only-name">Only-Name: <input type="text" placeholder="?" value="${this.ajson.properties["only-name"] || ""}"></li>
         <li id="area-name">Area-Name: <input type="text" placeholder="?" value="${this.ajson.properties["area-name"] || ""}"></li>
-        <li id="lighting">Lighting: <input type="number" placeholder="0" max="1" min="0" value=${this.ajson.properties["lighting"] || 0}></li>
+        <li id="lighting">Lighting: <input type="number" placeholder="0" max="1" min="0" value=${this.ajson.properties["lighting"] || 1}></li>
         `
     }
 
@@ -91,9 +100,9 @@ export default class Area {
         }
         ctx.beginPath()
         ctx.globalAlpha = this.mjson.datas.fillAlpha || 0.19
-        ctx.fillStyle = this.color
+        ctx.fillStyle = this.mjson.datas.fillStyle
         ctx.lineWidth = 6
-        ctx.strokeStyle = "FFF46C"
+        ctx.strokeStyle = "#FFF46C"
         ctx.fillRect((this.pos.x - off.x) / fov, (this.pos.y - off.y) / fov, (this.size.x) / fov, (this.size.y) / fov)
         if (this.selected) {
             ctx.globalAlpha = 1

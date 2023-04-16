@@ -88,6 +88,11 @@ canvas {
     transition: all 0.3s;
 }
 
+#panel>ul>li:hover {
+    border-left: rgb(233, 26, 26) 5px solid;
+    background-color: rgb(31, 31, 31);
+}
+
 #panel>ul>li>input {
     background-color: #414141;
     width: 50%;

@@ -98,6 +98,7 @@ const ctx = canvas.getContext("2d")
 let off = new Vector(-1280 / 2, -720 / 2)
 let fov = 1
 let selectedArea
+let selectedZone
 let hover = false
 let filename = ""
 let movement = {
@@ -185,12 +186,27 @@ document.addEventListener("mousemove", (e) => {
 document.addEventListener("mousedown", (e) => {
     if (play && !hover) {
         if (e.buttons == 1) {
+            let { offsetX: x, offsetY: y } = e
             movement.mouse = !movement.mouse
             selectedArea = null
+            selectedZone = null
             for (let a in world.areas) {
                 let area = world.areas[a]
                 if (area.hovered) {
                     area.selected = true
+                    for (let z in area.zones) {
+                        let zone = area.zones[z]
+                        if (x > (zone.x - off.x) / fov
+                            && x < ((zone.x - off.x) + zone.w) / fov
+                            && y > (zone.y - off.y) / fov
+                            && y < ((zone.y - off.y) + zone.h) / fov) {
+                            zone.selected = true
+                            selectedZone = zone.id
+                            document.querySelector('#panel-zone-props').innerHTML = zone.toHTML()
+                        } else {
+                            zone.selected = false
+                        }
+                    }
                     selectedArea = area.id
                     document.querySelector('#panel-area-props').innerHTML = area.toHTML()
                 } else {
@@ -201,14 +217,16 @@ document.addEventListener("mousedown", (e) => {
     }
 })
 document.addEventListener("wheel", e => {
-    let d = e.deltaY || e.detail || e.wheelDelta
-    if (d < 0) {
-        if (fov >= 1) {
-            fov -= 0.1 * (fov / 2)
-        }
-    } else {
-        if (fov <= 100) {
-            fov += 0.1 * (fov / 2)
+    if (!hover) {
+        let d = e.deltaY || e.detail || e.wheelDelta
+        if (d < 0) {
+            if (fov >= 1) {
+                fov -= 0.1 * (fov / 2)
+            }
+        } else {
+            if (fov <= 100) {
+                fov += 0.1 * (fov / 2)
+            }
         }
     }
 })
@@ -256,10 +274,17 @@ function resize() {
 function download(filename) {
     var element = document.createElement('a')
 
+    let outText
+    if (filename.endsWith(".json"))
+        outText = JSON.stringify(world.reverse(), null, 2)
+    if (filename.endsWith(".yaml")
+        || filename.endsWith(".yml"))
+        outText = YAML.stringify(world.reverse(), null, 2)
+
     element.setAttribute(
         'href',
         'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(world.reverse(), null, 2))
+        encodeURIComponent(outText)
     )
     element.setAttribute('download', filename)
 
@@ -304,9 +329,16 @@ function loop() {
     }
 
     document.querySelectorAll("input").forEach(el => {
-        if (selectedArea != undefined) {
-            let area = world.areas[selectedArea]
-            area.changeProps()
+        if (el.focus) {
+            if (selectedArea != undefined) {
+                let area = world.areas[selectedArea]
+                area.changeProps()
+                if (selectedZone != undefined) {
+                    let zone = world.areas[selectedArea].zones[selectedZone]
+                    zone.changeProps()
+                }
+            }
+            world.changeProps()
         }
     })
     player.move(movement)
