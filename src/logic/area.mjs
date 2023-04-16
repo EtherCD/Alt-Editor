@@ -54,8 +54,8 @@ export default class Area {
 
     reverse() {
         let area = {"properties": {}, "zones": []}
-        this.ajson.properties.size.width ? area.properties.width = this.ajson.properties.size.width : 'none'
-        this.ajson.properties.size.height ? area.properties.height = this.ajson.properties.size.height : 'none'
+        this.ajson.properties.size.width ? area.properties.size.width = this.ajson.properties.size.width : 'none'
+        this.ajson.properties.size.height ? area.properties.size.height = this.ajson.properties.size.height : 'none'
         this.ajson.properties["only-name"] != "" ? area.properties["only-name"] = this.ajson.properties["only-name"] : 'none'
         this.ajson.properties["area-name"] != "" ? area.properties["area-name"] = this.ajson.properties["area-name"] : 'none'
         this.ajson.properties["friction"] != 0.75 ? area.properties["friction"] = this.ajson.properties["friction"] : 'none'

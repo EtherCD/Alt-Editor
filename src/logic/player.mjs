@@ -38,22 +38,18 @@ export default class Player {
     }*/
 
     update(timeFix, delta, off, fov) {
-        if (Math.abs(this.vel.x) > 0.01) {
-
+        if (Math.abs(this.vel.x) > 0.1) {
+            this.vel.x = 0
         }
-        if (Math.abs(this.vel.y) > 0.01) {
-
+        if (Math.abs(this.vel.y) > 0.1) {
+            this.vel.y = 0
         }
 
-        let slide = [this.dmp.x + 0, this.dmp.y + 0]
-        slide[0] *= 1 - (this.friction * timeFix)
-        slide[1] *= 1 - (this.friction * timeFix)
+        //this.acc.x *= timeFix
+        //this.acc.y *= timeFix
+        this.acc.x *= 1 - (this.friction * timeFix)
+        this.acc.y *= 1 - (this.friction * timeFix)
 
-        this.acc.x *= timeFix
-        this.acc.y *= timeFix
-
-        this.acc.x += slide[0]
-        this.acc.y += slide[1]
         this.vel = new Vector(this.acc.x, this.acc.y)
         this.vel.x > this.speed ? this.vel.x = this.speed : 'none'
         this.vel.x < -this.speed ? this.vel.x = -this.speed : 'none'
@@ -62,13 +58,9 @@ export default class Player {
 
         off.x += this.vel.x * timeFix
         off.y += this.vel.y * timeFix
-        this.dmp.x = this.acc.x + 0
-        this.dmp.y = this.acc.y + 0
 
         this.speed = 17*fov
 
-        this.acc.x = 0
-        this.acc.y = 0
     }
 
     move(movement) {
