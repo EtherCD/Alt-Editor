@@ -164,11 +164,11 @@ export default class Zone {
         ctx.lineWidth = 1
         ctx.fillStyle = this.color
         ctx.fillRect((this.x - off.x) / fov, (this.y - off.y) / fov, (this.w) / fov, (this.h) / fov)
-        if (this.selected) {
+        /*if (this.selected) {
             ctx.strokeStyle = "#070707"
             ctx.lineWidth = 5
             ctx.strokeRect((this.x - off.x) / fov, (this.y - off.y) / fov, (this.w) / fov, (this.h) / fov)
-        }
+        }*/
         ctx.closePath()
     }
 

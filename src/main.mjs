@@ -216,9 +216,9 @@ document.addEventListener("mousedown", (e) => {
         }
     }
 })
-document.addEventListener("wheel", e => {
+canvas.addEventListener("wheel", e => {
     if (!hover) {
-        let d = e.deltaY || e.detail || e.wheelDelta
+        /*let d = e.deltaY || e.detail || e.wheelDelta
         if (d < 0) {
             if (fov >= 1) {
                 fov -= 0.1 * (fov / 2)
@@ -227,7 +227,14 @@ document.addEventListener("wheel", e => {
             if (fov <= 100) {
                 fov += 0.1 * (fov / 2)
             }
-        }
+        }*/
+        if (e.ctrlKey) return
+        let m = 0.85 ** (e.deltaY / 125)
+        let x = (e.offsetX) * fov + off.x
+        let y = (e.offsetY) * fov + off.y
+        off.x = (m * x - x + off.x) / m
+        off.y = (m * y - y + off.y) / m
+        fov /= m
     }
 })
 document.getElementById("input").addEventListener('change', () => {

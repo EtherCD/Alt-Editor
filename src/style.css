@@ -95,11 +95,41 @@ canvas {
 
 #panel>ul>li>input {
     background-color: #414141;
-    width: 50%;
-    height: 95%;
     float: right;
-    border: #232323 solid 1px;
     color: white;
-    transition: all 0.5s;
     text-indent: 5px;
+    border: none;
+    width: 60%;
+    height: 120%;
+    box-sizing: border-box;
+}
+#panel>ul>li>input[type="color"] {
+    background-color: #414141;
+    float: right;
+    color: white;
+    text-indent: 5px;
+    border: none;
+    width: 45%;
+    height: 75%;
+    box-sizing: border-box;
+}
+
+#panel>ul>li>input[type="number"] {
+    border: none;
+    float: right;
+    width: 60%;
+    box-sizing: border-box;
+}
+#panel>ul>li>input:hover {
+    background-color: #515151;
+}
+
+#secpanel {
+    margin-top: 10px;
+    display: flex;
+    border: red solid 2px;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    width: 100%;
+    align-items: flex-start;
 }

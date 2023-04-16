@@ -11,7 +11,7 @@ export default class Area {
         this.pos = pos
         this.zones = {}
         this.name = data.properties["only-name"] || data.properties["area-name"] || id
-        this.oldSize = new Vector(this.size.x+0, this.size.y+0)
+        this.oldSize = new Vector(this.size.x + 0, this.size.y + 0)
         this.fromJSON()
 
         this.hovered = false
@@ -53,7 +53,7 @@ export default class Area {
     }
 
     reverse() {
-        let area = {"properties": {}, "zones": []}
+        let area = { "properties": {}, "zones": [] }
         this.ajson.properties.size.width ? area.properties.size.width = this.ajson.properties.size.width : 'none'
         this.ajson.properties.size.height ? area.properties.size.height = this.ajson.properties.size.height : 'none'
         this.ajson.properties["only-name"] != "" ? area.properties["only-name"] = this.ajson.properties["only-name"] : 'none'
@@ -74,12 +74,14 @@ export default class Area {
         this.changeProp("only-name", this.getPanelValue("#only-name"))
         this.changeProp("area-name", this.getPanelValue("#area-name"))
         this.changeProp("lighting", this.getPanelValue("#lighting"))
-        this.size = new Vector(this.ajson.properties.size.width * 32, this.ajson.properties.size.height * 32)
-        this.name = this.ajson.properties["only-name"] || this.ajson.properties["area-name"] || this.id
-        if (this.size != this.oldSize) {
-            
+        if (!!Number(this.ajson.properties.size.width) && !!Number(this.ajson.properties.size.height)) {
+            this.size = new Vector(this.ajson.properties.size.width * 32, this.ajson.properties.size.height * 32)
+        } else {
+            this.size = this.oldSize
+        
         }
-        this.oldSize = new Vector(this.size.x+0, this.size.y+0)
+        this.name = this.ajson.properties["only-name"] || this.ajson.properties["area-name"] || this.id
+        this.oldSize = new Vector(this.size.x + 0, this.size.y + 0)
     }
 
     toHTML() {
@@ -101,8 +103,8 @@ export default class Area {
         ctx.beginPath()
         ctx.globalAlpha = this.mjson.datas.fillAlpha || 0.19
         ctx.fillStyle = this.mjson.datas.fillStyle
-        ctx.lineWidth = 6
-        ctx.strokeStyle = "#FFF46C"
+        ctx.lineWidth = 4
+        ctx.strokeStyle = "#FFFFFF"
         ctx.fillRect((this.pos.x - off.x) / fov, (this.pos.y - off.y) / fov, (this.size.x) / fov, (this.size.y) / fov)
         if (this.selected) {
             ctx.globalAlpha = 1
@@ -111,10 +113,6 @@ export default class Area {
             ctx.strokeRect((this.pos.x - off.x) / fov, (this.pos.y - off.y) / fov, (this.size.x) / fov, (this.size.y) / fov)
             ctx.setLineDash([0, 0])
             ctx.lineDashOffset = 0
-        }
-        else if (this.hovered) {
-            ctx.globalAlpha = 1
-            ctx.strokeRect((this.pos.x - off.x) / fov, (this.pos.y - off.y) / fov, (this.size.x) / fov, (this.size.y) / fov)
         }
         ctx.closePath()
         ctx.beginPath()

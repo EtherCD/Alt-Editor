@@ -31,8 +31,8 @@ export default class World {
         return `
                 <li id="fillstyle">fillStyle: <input type="color" value="${this.mjson.datas.fillStyle}"></li>
                 <li id="fillalpha">fillAlpha: <input type="number" value=${this.mjson.datas.fillAlpha || 0.19} min="0" max="1"></li>
-                <li id="textfill">title->fillStyle: <input type="color" value=${this.mjson.datas.title.fillStyle}></li>
-                <li id="textstroke">title->strokeStyle: <input type="color" value=${this.mjson.datas.title.strokeStyle}></li>
+                <li id="textfill">title->fill: <input type="color" value=${this.mjson.datas.title.fillStyle}></li>
+                <li id="textstroke">title->stroke: <input type="color" value=${this.mjson.datas.title.strokeStyle}></li>
                 `
     }
 
